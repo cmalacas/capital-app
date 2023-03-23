@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- CSRF Token -->
+	<meta name="csrf-token" content="">
+
+	<title>CapitalApp</title>
+
+	<!-- Scripts -->
+	<script src="http://app.capital-office.co.uk/js/app.js" defer></script>
+
+	<!-- Fonts -->
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+
+	<!-- Styles -->
+	<link href="http://app.capital-office.co.uk/css/app.css" rel="stylesheet">
+</head>
+
+<body>
+	<div id="root">
+		<nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+			<div class="container">
+				<a class="navbar-brand" href="http://app.capital-office.co.uk">
+					Capital Office
+				</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+					<!-- Left Side Of Navbar -->
+					<ul class="navbar-nav mr-auto">
+
+					</ul>
+
+					<!-- Right Side Of Navbar -->
+					<ul class="navbar-nav ml-auto">
+						<!-- Authentication Links -->
+						<li class="nav-item dropdown">
+							<a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+								<span class="caret"></span>
+							</a>
+
+							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+								<a class="dropdown-item" href="http://app.capital-office.co.uk/logout" onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">
+									Logout
+								</a>
+
+								<form id="logout-form" action="http://app.capital-office.co.uk/logout" method="POST"
+									style="display: none;">
+									<input type="hidden" name="_token" value="">                                    </form>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+
+		<main class="py-4">
+			<form method=POST id="SagePayForm" action="https://test.sagepay.com/gateway/service/vspform-register.vsp">
+				<input type="hidden" name="VPSProtocol" value="3.00" />
+				<input type="hidden" name="TxType" value="PAYMENT" />
+				<input type="hidden" name="Vendor" value="capitalofficeli" />
+				<input type="hidden" name="Crypt" value="@B670ADED736B7A6CD5A4B90D8B47D2A6A0498655366308C5C053AD7FD48F7858EDABBDC8C9E6BBDC5D855CFA26179F9C2159FA4EECF721050E7F6973312286AD7DE8C210A8C327BDD10F3A2A73EDEF9624348FF38010EF2BE677E4ADA86024803E0E6AA7EAA25A5455005C822C37BBCBD540F2611DAF5FF560F4B3136A3907BE3D355336F195F59C5A0214F52FE643FAF74E8BBDDA4A805D6F578CBD52C43CEDA6575919E04132351DDD487109F7504BF164A67C1907E081D37830A78D12E9B4EF2EC96F4E674CCB684DAFBF6778A77CD15373973F3F5F18B50BE3A08E05D844D089DECAED227A2E7FD9743B10B9F0ECE2C51B858B2476433C760856B551C2256B4B9734F31217039753E27F7885DF05B303C08B8ECBE4336B809A93B60D0C4E507E53FCB3156B1B3B450C0CAE2DCCD53F006FB232EA18806B27D5CB63F36CBE310EC4B67BFF3E7129AAEC5E359D0EFEEB0F41F5610E021B062FF3A9A208CB7AF17F0EFDE71A30D95EC48EA381633F422A3E4F8DA76FED7D093064569DC246F764EA3F4B190C964B3C6AF3D2DE9F4447097E27DE74EA3210739552FADE27833782449995A1089121EE0809887096FA23A336443C4F62A87EB0BA4C2F9818FD8700FA1142106B3A4684EE9A9AF5A7EA33234E73BCFEB4FEA78D8537F6576BA80518BCD732B7B96C002A2C4BC67AA0D0985DFE91807420D411B341ECA68AC12B6190A9AD03938B417CC2C584FAB5A49EC8AE0297A79CA181CDD73CA20F217DE7A71BC9FDF1DDC98701C8E1FCA4EB8A5CD3CABA09F2BFCF3DB116AC5AF2EA3485258493D5EAEB505417800ED81CF150602F9D33EE0E39D594E5BA7A796E6D65ECC3B1911DE417A023CFBAB0E385E2C6B337858A29A6995B6C529201B23972FD70CCD6DD955E536FE2E1775365554F35BEDDC32C500D6B19E0113E7D0A2DE36D943F" />
+				<input type="submit" value="Pay">
+    </form>
+
+				<script>
+					document.getElementById("SagePayForm").submit();
+				</script>
+		</main>
+	</div>
+</body>
+
+</html>
