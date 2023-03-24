@@ -3017,5 +3017,72 @@ class ClientController extends Controller
 
         }
     }
+
+
+    public function invoiceSuccess($id) {
+
+        $gateway = OmniPay::create('SagePay\Form')->initialize([
+            'vendor' => env('SAGEPAY_VENDOR'),
+            'testMode' => env('SAGEPAY_TESTMODE'),
+            'encryptionKey' => env('SAGEPAY_KEY')
+        ]);
+
+        $invoice = InvoiceMaster::find($id);
+
+        $client_id = $invoice->client_id;
+        $company_id = $invoice->company_id;
+
+        $client = Client::find($client_id);
+
+        $company = Company::find($company_id);
+       
+
+        if (isset($_GET['crypt'])) {
+
+            $crypt = $_GET['crypt']; 
+        
+            $response = $gateway->completePurchase(['crypt' => $crypt])->send();
+
+            $transaction_id = $response->getTransactionId();
+
+            $invoice->paid_at = date("Y-m-d H:i:s");
+
+            $invoice->save();
+
+            $sage = new SageTransaction;
+
+            $sage->client_id = $client_id;
+
+            $res = SageTransaction::where('invoice_id', '=', $id)->get();
+
+            if ($res->isEmpty()) {
+
+                $response->payment_type = 1;
+                $transaction = $sage->update_invoice_transactions($id, $response, 'online');
+                
+            }
+
+            $client_name = sprintf("%s %s", $client->first_name, $client->last_name);
+
+            $content = sprintf("%s paid the invoice #: %s", $client_name, $id);
+
+            $subject = sprintf("INVOICE NUMBER %s PAID - COMPANY NAME %s", $id, $company->name);
+
+            $admin = new SendMailable($content, $subject);
+
+            $admin->to_email = 'info@capital-office.co.uk';
+            $admin->to_name = 'Capital Office';
+            $admin->email = 'info@capital-office.co.uk';
+
+            //Mail::to($admin->email)->send($admin);
+
+            //dispatch(new sendMailJob($admin))->delay(Carbon::now()->addSeconds(5));    
+                        
+
+        }
+
+        return response()->json(['invoice' => $invoice, 'status' => 'success']);
+
+    }
     
 }
