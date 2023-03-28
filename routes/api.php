@@ -25,7 +25,7 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
 
     Route::get('/invoice/{id}/pay-now', 'Api\ClientController@payNowInvoice');
 
-    Route::post('/save-profile', 'Api\ClientController@saveProfile');
+    Route::get('/save-profile', 'Api\ClientController@saveProfile');
 
     Route::get('/invoice/{id}/pay-now', 'Api\ClientController@invoicePayNow');
 
@@ -33,17 +33,17 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
 
     Route::get('/invoice/{id}/failed', 'Api\ClientController@invoiceFailed');
 
-    Route::post('/update-password', 'Api\ClientController@updatePassword');
+    Route::get('/update-password', 'Api\ClientController@updatePassword');
 
-    Route::post('/pay-via-commission', 'Api\ClientController@payViaCommission');
+    Route::get('/pay-via-commission', 'Api\ClientController@payViaCommission');
 
-    Route::post('/save-scan-via-commission', 'Api\ClientController@saveScanViaCommission');
+    Route::get('/save-scan-via-commission', 'Api\ClientController@saveScanViaCommission');
 
-    Route::post('/transfer-funds-to-scans', 'Api\ClientController@transferFundsToScans');
+    Route::get('/transfer-funds-to-scans', 'Api\ClientController@transferFundsToScans');
  
-    Route::post('/pay-now', 'Api\ClientController@payNow');
+    Route::get('/pay-now', 'Api\ClientController@payNow');
 
-    Route::post('/save-scan', 'Api\ClientController@saveScan');
+    Route::get('/save-scan', 'Api\ClientController@saveScan');
 
     Route::get('/topup/{id}/success', 'Api\ClientController@topUpSuccess');
 
@@ -55,17 +55,17 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
 
     Route::get('/{id}/renew', 'Api\ClientController@renew');
 
-    Route::post('/pay-renew', 'Api\ClientController@payRenew');
+    Route::get('/pay-renew', 'Api\ClientController@payRenew');
 
     Route::get('/{id}/renew-success', 'Api\ClientController@renewSuccess');
 
     Route::get('/{id}/renew-failed', 'Api\ClientController@renewFailed');
 
-    Route::post('/coupon', 'Api\ClientController@getCoupon');
+    Route::get('/coupon', 'Api\ClientController@getCoupon');
 
     Route::get('/add-new-service', 'Api\ClientController@addNewService');
 
-    Route::post('/pay-new-service', 'Api\ClientController@payNewService');
+    Route::get('/pay-new-service', 'Api\ClientController@payNewService');
 
     Route::get('/{id}/new-service-success', 'Api\ClientController@newServiceSuccess');
 

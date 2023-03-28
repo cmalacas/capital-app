@@ -1698,9 +1698,9 @@ class ClientController extends Controller
         $url = $response->getRedirectUrl();
         $hiddenFormItems = $response->getRedirectData();        
 
-        $request->session()->put('sagepay-method', $method);
-        $request->session()->put('sagepay-url', $url);
-        $request->session()->put('sagepay-items', $hiddenFormItems);
+        //$request->session()->put('sagepay-method', $method);
+        //$request->session()->put('sagepay-url', $url);
+        //$request->session()->put('sagepay-items', $hiddenFormItems);
 
         $data['success'] = 1;
         $data['code'] = $virtual->id;   
