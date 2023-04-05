@@ -294,6 +294,8 @@ class ClientController extends Controller
         foreach( $accounts as $a ) {
 
             $a->documents;
+            $a->emails;
+            $a->directors;
 
         }
 
@@ -2258,11 +2260,11 @@ class ClientController extends Controller
 
             $user_subject = $template->subject;
             
-            $info_email = Setting::where('name', '=', 'info_email')->first()->value;
+            //$info_email = Setting::where('name', '=', 'info_email')->first()->value;
             
-            $info_name = Setting::where('name', '=', 'info_name')->first()->value;
+            //$info_name = Setting::where('name', '=', 'info_name')->first()->value;
 
-            $admin_email = Setting::where('name', '=', 'admin_email')->first()->value;
+            //$admin_email = Setting::where('name', '=', 'admin_email')->first()->value;
 
             //$this->pushEmailToQueue($admin_email, $info_name, $info_email, $info_name, $user_subject, $user_email_body, 'ORDER PLACED-ADMIN', '', '', '', $file, 1);
 
@@ -3082,6 +3084,63 @@ class ClientController extends Controller
         }
 
         return response()->json(['invoice' => $invoice, 'status' => 'success']);
+
+    }
+
+    public function getCompanyInformation($id) {
+
+        $company = Company::select(
+                        'companies.*',
+                        DB::raw('company_informations.answer_1'),
+                        DB::raw('company_informations.answer_2'),
+                        DB::raw('company_informations.answer_3'),
+                        DB::raw('company_informations.answer_4'),
+                        DB::raw('company_informations.answer_5'),
+                        DB::raw('company_informations.phone_script')
+                    )
+                    ->whereRaw('companies.id = ' . $id)
+                    ->leftJoin('company_informations', 'company_informations.company_id', '=', 'companies.id')
+                    ->first();
+        
+        return response()->json(['company' => $company]);
+
+    }
+
+    public function saveCompanyInformation(Request $request) {
+
+        $id  = $request->get('company_id');
+
+        $answer_1 = $request->get('answer_1');
+
+        $answer_2 = $request->get('answer_2');
+
+        $answer_3 = $request->get('answer_3');
+
+        $answer_4 = $request->get('answer_4');
+
+        $answer_5 = $request->get('answer_5');
+
+        $company = CompanyInformation::firstOrNew(['company_id' => $id]);
+
+        $company->company_id = $id;
+
+        $company->answer_1 = $answer_1;
+
+        $company->answer_2 = $answer_2;
+
+        $company->answer_3 = $answer_3;
+
+        $company->answer_4 = $answer_4;
+
+        $company->answer_5 = $answer_5;
+
+        $company->created_user_id = auth()->id();
+
+        $company->modified_user_id = auth()->id();
+
+        $company->save();
+
+        return $this->getCompanyInformation($id);
 
     }
     

@@ -1,0 +1,202 @@
+{
+	"info": {
+		"_postman_id": "cf93583a-2e66-4b03-99f4-448fc4a39b0a",
+		"name": "Capital App",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "3418601"
+	},
+	"item": [
+		{
+			"name": "https://app.capital-office.co.uk/api/login",
+			"request": {
+				"method": "POST",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/accounts",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/services",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/post-history",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/pay-invoice",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/postage-funds",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/payment-history",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/affiliates",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/save-profile",
+			"request": {
+				"method": "post",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/notifications",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/invoice/[invoice-id]/pay-now",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/pay-now",
+			"request": {
+				"method": "POST",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/pay-via-commission",
+			"request": {
+				"method": "POST",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/save-scan-via-commission",
+			"request": {
+				"method": "POST",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/transfer-funds-to-scans",
+			"request": {
+				"method": "POST",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/add-new-service",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/[order-id]/renew",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/coupon",
+			"request": {
+				"method": "POST",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/pay-renew",
+			"request": {
+				"method": "POST",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/[new-order-id]/renew-success",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/pay-new-service",
+			"request": {
+				"method": "POST",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/499441/new-service-success",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/company-information/499441/edit",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/save-company-information",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}

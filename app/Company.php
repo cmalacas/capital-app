@@ -83,7 +83,9 @@ class Company extends Model
     }
 
     public function emails() {
-        return $this->hasMany('App\EmailQueue', 'company_id')->orderBy('created', 'desc');
+        return $this->hasMany('App\EmailQueue', 'company_id')
+                ->where('show_to_client', '=', 1)
+                ->orderBy('created', 'desc');
     }
 
     public function forwarding_emails() {
