@@ -297,9 +297,76 @@ class ClientController extends Controller
             $a->emails;
             $a->directors;
 
+            $orders = Order::select('orders.id', 
+                                 DB::raw('IF(c.amlc_status = 1, 1, orders.amlc) as amlc'),
+                                 'orders.client_id',
+                                 'orders.company_id',
+                                 'orders.order_date',
+                                 'orders.contract_startdate',
+                                 'orders.contract_enddate',
+                                 DB::raw('c.name as company_name'), 
+                                 DB::raw('p.name as product_name'), 
+                                 DB::raw('p.manual_activation_required'),
+                                 DB::raw('CONCAT(c2.last_name, ", ", c2.first_name) as client_name'),
+                                 DB::raw('c2.industry as client_industry'),
+                                 DB::raw('c.amlc_status')
+                            )
+                        ->join('sagetransactions', 'sagetransactions.order_id', '=', 'orders.id')
+                        ->join('companies as c', 'c.id', '=', 'orders.company_id')
+                        ->join('clients as c2', 'c2.id', '=', 'orders.client_id')
+                        ->join('products_v2 as p', 'p.id', '=', 'orders.product_id')
+                        ->orderBy('orders.created', 'desc')
+                        ->whereRaw("product_id IN (SELECT id FROM products_v2 WHERE amlc_checks_required = 1 and manual_activation_required = 0)")
+                        ->where('package_order_id', '=', 0)
+                        ->where('sagetransactions.payment_status', '=', 2)
+                        ->where('orders.type', '=', 0)
+                        ->where('orders.deleted', '=', 0)
+                        ->where('company_id', '=', $a->id)
+                        ->get();
+
+           
+
+            foreach($orders as $o) {
+
+                $o->amlc_notes;                
+
+            }
+
+            $amlq = [
+                        'action_needed' => $orders->filter(function($row, $key) {
+                                                return $row->amlc == 0 && $row->manual_activation_required == 0;
+                                            }),
+                        'invited' => $orders->filter(function($row, $key) {
+                                            return $row->amlc == 2;
+                                        }),
+                        'requested' => $orders->filter(function($row, $key) {
+                                            return $row->amlc == 3;
+                                        }),
+                        'passed' => $orders->filter(function($row, $key) {
+                                        return $row->amlc == 1;
+                                    }),
+                        'cancelled' => $orders->filter(function($row, $key) {
+                                            return $row->amlc == 4;
+                                        }),
+                        'manual_activation' => $orders->filter(function($row, $key) {
+                                            return $row->amlc == 0 && $row->manual_activation_required == 1;
+                                        }),
+                        'failed' => [],
+                    ];
+
+            $a->amlq = $amlq;
+
         }
 
         $client->accounts = $accounts;
+
+        $client->company_types = [
+            1 => 'Limited Company',
+            2 => 'Partnership',
+            3 => 'Charity',
+            4 => 'Limited by Guarantee',
+            5 => 'Sole Trader'
+        ];
 
         $data['client'] = $client;
 
@@ -3141,6 +3208,51 @@ class ClientController extends Controller
         $company->save();
 
         return $this->getCompanyInformation($id);
+
+    }
+
+    public function saveNewAccount(Request $request) {
+
+        $company = new Company;
+
+        $current = $company->toArray();
+
+        $website = $request->get('website');
+ 
+        if (!empty($website) && preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i", $website))
+        {
+            if (!preg_match('|^http(s)?://[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i', $website))
+            {
+                $website = 'http://' . $website;
+            }
+        }
+
+        $company->name = $request->get('name');
+        $company->email = $request->get('email');
+        
+        $company->client_id = $request->get('client_id');
+        
+        $company->user_id = 9999;
+        
+        $company->phone_number = $request->get('phone_number');
+        $company->known_as = (string)$request->get('known_as');
+        $company->website = (string)$website;
+        $company->city = (string)$request->get('city');
+        
+        $company->company_type = (string)$request->get('company_type');
+
+        $company->address_1 = (string)$request->get('address');
+        $company->post_code = (string)$request->get('post_code');
+        $company->industry = $request->get('company_type');
+        $company->status = 1;
+
+        $company->save();
+
+        $client = Client::find($request->get('client_id'));
+
+        $this->save_log( $current, $company, 'Company', $client);
+
+        return response()->json(['success' => 1], 200, [], JSON_NUMERIC_CHECK);
 
     }
     

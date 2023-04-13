@@ -197,6 +197,14 @@
 				"header": []
 			},
 			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/save-new-account",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
 		}
 	]
 }

@@ -231,7 +231,13 @@ class Order extends Model
 	}
 
 	public function amlc_notes() {
-		return $this->hasMany('App\OrderAmlcNote', 'order_id');
+		return $this->hasMany('App\OrderAmlcNote', 'order_id')
+							->select('order_amlc_notes.*', 
+									     DB::raw('CONCAT(first_name, " ", last_name) AS created_by'),
+											 DB::raw('DATE_FORMAT(order_amlc_notes.created_at, "%d %M %Y %h:%i") as date')
+										)
+							->join('new_users', 'new_users.id', '=', 'created_by')
+							->orderBy('order_amlc_notes.created_at');
 	}
 
 	public function virtual_account() {

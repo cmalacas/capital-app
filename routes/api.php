@@ -73,4 +73,6 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
 
     Route::get('/save-company-information', 'Api\ClientController@saveCompanyInformation');
 
+    Route::get('/save-new-account', 'Api\ClientController@saveNewAccount');
+
 });
