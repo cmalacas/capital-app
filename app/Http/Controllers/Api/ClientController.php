@@ -390,10 +390,10 @@ class ClientController extends Controller
 
         $services = [];
 
-        $orders = DB::table('orders')
+        $results = DB::table('orders')
                         ->select('orders.*', 
                                     DB::raw('companies.name as company_name'), 
-                                    
+                                    DB::raw('IF(package_order_id = 0, orders.id, package_order_id) as package_order_id'),
                                     DB::raw('clients.first_name as client_first_name'),
                                     DB::raw('clients.last_name as client_last_name'),
                                     DB::raw('new_users.first_name as user_first_name'),
@@ -416,7 +416,7 @@ class ClientController extends Controller
                                     DB::raw('products_v2.modified as product_modified'),
                                     DB::raw('products_v2.amlc_checks_required as product_amlc_checks_required'),
                                     DB::raw('products_v2.manual_activation_required'),
-                                    DB::raw('(SELECT COALESCE(payment_status, 0) FROM sagetransactions WHERE order_id = orders.id AND payment_status = 2 ORDER BY id DESC LIMIT 1) AS payment_status')
+                                    DB::raw('sagetransactions.payment_status')
                                 )
                         ->join('companies', 'companies.id', '=', 'orders.company_id')
                         ->join('clients', 'clients.id', '=', 'orders.client_id')
@@ -427,12 +427,25 @@ class ClientController extends Controller
                         ->whereRaw('orders.deleted = 0')
                         ->whereRaw('companies.deleted = 0')
                         ->whereRaw('orders.client_id = ' . $client_id)
+                        ->whereRaw('sagetransactions.payment_status = 2')
                         ->orderBy('orders.contract_enddate', 'desc')
-                        ->orderBy('orders.id', 'desc');
+                        ->orderBy('orders.id', 'desc')
+                        ->get();
         
-        $posts = $orders;
+        //$posts = $results;
 
-        $orders = $orders->get(); 
+        //print_r($results->toArray());
+
+        $orders = $results->filter(function($row)  {
+
+                    return $row->expired_status == 0 && (
+                        $row->product_type == 0 || 
+                        $row->product_type == 2 ||
+                        $row->product_type == 3);
+
+                })->all();
+        
+        //$orders = $orders->where('expired_status', '=', 0)->get(); 
 
         foreach($orders as $o) {
 
@@ -564,19 +577,86 @@ class ClientController extends Controller
                                 ->whereRaw('order_id IN (SELECT id FROM orders WHERE client_id = '. $client_id .')')
                                 ->get();
 
-        $client->transactions = $transactions; 
+        //$client->transactions = $transactions; 
 
-        $client->orders = $orders;
+        //$client->orders = $results->get();
 
-        $client->service_posts =  $posts->where('orders.type', '=', 1)->get();
+        
 
-        $client->post_logs;
+        $histories = $results->filter(function($row) {
 
-        $client->sagetransactions;
+                    return $row->expired_status == 1;
+
+                })->all();
+
+        $history = [];
+        $posts = [];
+
+        foreach($histories as $o) {
+
+            $s = (object)[];
+
+            $s->product_name = $o->pname;
+            //$s->product = $o->product;
+            $s->product_term = $o->product_term;
+            $s->company_name = $o->company_name;
+            $s->contract_enddate = $o->contract_enddate;
+            $s->contract_startdate = $o->contract_startdate;
+            $s->order_date = $o->order_date;
+            //$s->sagetransactions = $o->sagetransactions;
+            //$s->transactions = $o->transactions;
+            $s->order_status  = $o->order_status;
+            $s->expired_status = $o->expired_status;
+            $s->id = $o->id;
+            $s->package_order_id = $o->package_order_id;
+            $s->amount = $o->amount;
+            $s->payment_status = $o->payment_status;
+
+            $history[] = $s;
+
+        }
+
+        $_posts = $results->filter(function($row) {
+
+            return $row->product_type == 1;
+
+        });
+
+        foreach($_posts as $o) {
+
+            $s = (object)[];
+
+            $s->product_name = $o->pname;
+            //$s->product = $o->product;
+            $s->product_term = $o->product_term;
+            $s->company_name = $o->company_name;
+            $s->contract_enddate = $o->contract_enddate;
+            $s->contract_startdate = $o->contract_startdate;
+            $s->order_date = $o->order_date;
+            //$s->sagetransactions = $o->sagetransactions;
+            //$s->transactions = $o->transactions;
+            $s->order_status  = $o->order_status;
+            $s->expired_status = $o->expired_status;
+            $s->id = $o->id;
+            $s->package_order_id = $o->package_order_id;
+            $s->amount = $o->amount;
+            $s->payment_status = $o->payment_status;
+
+            $posts[] = $s;
+
+        }
+
+        //$client->service_posts =  $posts->where('orders.type', '=', 1)->get();
+
+        //$client->post_logs;
+
+        //$client->sagetransactions;
 
         $client->services = $services;
+        $client->history = $history;
+        $client->posts = $posts;
 
-        $client->included = $included;
+        //$client->included = $included;
 
         $data['client'] = $client;
 
