@@ -3335,5 +3335,64 @@ class ClientController extends Controller
         return response()->json(['success' => 1], 200, [], JSON_NUMERIC_CHECK);
 
     }
+
+    public function serviceDetails($id) {
+
+        $order = Order::select(
+                        DB::raw('orders.id'),
+                        DB::raw('orders.client_id'),
+                        DB::raw('orders.product_id'),
+                        DB::raw('orders.company_id'),
+                        DB::raw('CONCAT("CPOO", orders.id) as order_number'),
+                        DB::raw('products_v2.name as product_name'),
+                        DB::raw('IF(orders.order_status = 1, "Active", "Not Active") as order_status'),
+                        DB::raw('IF(products_v2.term = 0, "One-time", "Recurring") as pricing_type'),
+                        DB::raw('IF(products_v2.type = 1, "Logging Post", "Product") as product_type'),
+                        DB::raw('CONCAT("£", FORMAT(orders.amount, 2)) as amount'),
+                        DB::raw('CONCAT("£", FORMAT(orders.total_amount, 2)) as total_amount'),
+                        DB::raw('IF(term = 12, "12 Months", IF(term = 6, "6 Months", IF(term = 3, "3 Months", IF(term = 1, "1 Month", "One-time")))) AS service_contract'),
+                        DB::raw('CONCAT(clients.first_name, " ", clients.last_name) as client_name'),
+                        DB::raw('companies.name as company_name'),
+                        DB::raw('(SELECT GROUP_CONCAT(product_name) FROM orders o2 WHERE o2.package_order_id = orders.id) as addon_packages'),
+                        DB::raw('DATE_FORMAT(order_date, "%d %b %Y") as order_date'),
+                        DB::raw('DATE_FORMAT(contract_startdate, "%d %b %Y") as contract_startdate'),
+                        DB::raw('DATE_FORMAT(contract_enddate, "%d %b %Y") as expiry_date'),
+                        DB::raw('IF(discount_type = 1, "Initial Discount", IF(discount_type = 2, "Total Discount", "None")) as discount_type'),
+                        DB::raw('CONCAT("£", FORMAT(total_discount_amount, 2)) as discount_amount'),
+                        DB::raw('vat'),
+                        DB::raw('IF(term = 12, "Yearly", IF(term = 6, "Halfyearly", IF(term = 3, "Quarterly", IF(term = 1, "Monthly", "One-time")))) as recurring_type'),
+                        DB::raw('IF(term = 12, "12 Months", IF(term = 6, "6 Months", IF(term = 3, "3 Months", IF(term = 1, "1 Month", "One-time")))) AS contract_length'),
+                    )
+                    ->join('products_v2', 'products_v2.id', '=', 'product_id')
+                    ->join('clients', 'clients.id', '=', 'orders.client_id')
+                    ->join('companies', 'companies.id', '=', 'company_id')
+                    ->where('orders.id', '=', $id)
+                    ->first();
+
+        $transactions = Sagetransaction::select(
+                                DB::raw('CONCAT("£", FORMAT(amount, 2)) AS amount'),
+                                'transaction_id',
+                                'profile_id',
+                                'offline_notes',
+                                DB::raw('DATE_FORMAT(created, "%d %b %Y") as payment_date'),
+                                DB::raw('IF(payment_type = 1, "Online", "Offline") as payment_type'),
+                                DB::raw('IF(payment_status = 2, "Success", "Failed") as payment_status')                                
+                            )
+                            ->where('order_id', '=', $id)
+                            ->get();
+
+        $order->transactions = $transactions;
+
+        //$order->client;
+
+        //$order->company;
+
+        //$order->product;
+
+        $data['order'] = $order;
+
+        return response()->json($data, 200, [], JSON_NUMERIC_CHECK);
+
+    }
     
 }

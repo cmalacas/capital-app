@@ -205,6 +205,14 @@
 				"header": []
 			},
 			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/service/{id}/details",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
 		}
 	]
 }
