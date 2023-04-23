@@ -77,4 +77,6 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
 
     Route::get('/service/{id}/details', 'Api\ClientController@serviceDetails');
 
+    Route::get('/save-token', 'Api\ClientController@saveToken');
+
 });

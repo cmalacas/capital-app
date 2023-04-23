@@ -3394,5 +3394,19 @@ class ClientController extends Controller
         return response()->json($data, 200, [], JSON_NUMERIC_CHECK);
 
     }
+
+    public function saveToken(Request $request) {
+
+        $token = $request->get('token');
+
+        $client = Auth::user();
+
+        $client->fcm_token = $token;
+
+        $client->save();
+
+        return response()->json(['success' => 1], 200, [], JSON_NUMERIC_CHECK);
+
+    }
     
 }

@@ -213,6 +213,15 @@
 				"header": []
 			},
 			"response": []
+		},
+		{
+			"name": "https://app.capital-office.co.uk/api/save-token",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
 		}
+
 	]
 }
