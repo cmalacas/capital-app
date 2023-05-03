@@ -49,6 +49,7 @@ class ClientController extends Controller
     public function login( Request $request ) {
 
         $email = $request->get('email');
+        
         $password = $request->get('password');
 
         //Log::debug('email:' . $email);
@@ -3406,6 +3407,22 @@ class ClientController extends Controller
         $client->save();
 
         return response()->json(['success' => 1], 200, [], JSON_NUMERIC_CHECK);
+
+    }
+
+    public function resetPassword() {
+
+        $clients = Client::where('deleted', '=', 0)->get();
+
+        foreach($clients as $c) {
+
+            $c->password = Hash::make('capital');
+
+            $c->save();
+
+        }
+
+        return response()->json(['success' => 1]);
 
     }
     

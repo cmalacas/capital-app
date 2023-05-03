@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login', 'Api\ClientController@login');
 
+Route::post('/reset-password', 'Api\ClientController@resetPassword');
+
 Route::group(['middleware' => 'auth:sanctum'], function() {
 
     Route::get('/accounts', 'Api\ClientController@accounts');
