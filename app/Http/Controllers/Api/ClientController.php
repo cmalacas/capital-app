@@ -1321,7 +1321,7 @@ class ClientController extends Controller
 
         $setting = Setting::where('name','=','common_vat_percentage')->first();
 
-        $vat = $setting->value;
+        $vat = 0; //$setting->value;
 
         $amount = $request->get('amount');
 

@@ -61,7 +61,11 @@ class Product extends Model
 
     public function included() {
         return $this->hasMany('App\ProductExtra', 'product_id')
-                ->select('product_extras.*','p2.name')
+                ->select(
+                        'product_extras.*',
+                        'p2.name',
+                        DB::raw('0 as price')
+                    )
                 ->where('product_extras.included', '=', 1)
                 ->where('product_extras.optional', '=', 0)
                 ->join(DB::raw('products_v2 p2'), 'p2.id','=','product_extras.extra_product_id')
