@@ -7,6 +7,10 @@ Route::post('/login', 'Api\ClientController@login');
 
 Route::post('/reset-password', 'Api\ClientController@resetPassword');
 
+Route::get('/order/{id}/invoice', 'Api\ClientController@orderInvoice');
+
+Route::get('/forgot-password', 'Api\ClientController@forgotPassword');
+
 Route::group(['middleware' => 'auth:sanctum'], function() {
 
     Route::get('/accounts', 'Api\ClientController@accounts');
@@ -80,5 +84,7 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
     Route::get('/service/{id}/details', 'Api\ClientController@serviceDetails');
 
     Route::get('/save-token', 'Api\ClientController@saveToken');
+    
+    
 
 });

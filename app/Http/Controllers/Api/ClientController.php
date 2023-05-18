@@ -11,6 +11,8 @@ use App\Mail\SendMailable;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
 
 use App\Client;
 use App\Company;
@@ -28,6 +30,8 @@ use App\OrderRenewal;
 use App\EmailTemplate;
 use App\Coupon;
 use App\ProductCategory;
+
+use App\Rules\MatchOldPassword;
 
 use App\User;
 use Omnipay\Omnipay;
@@ -830,13 +834,15 @@ class ClientController extends Controller
         $client_id = $client->id;
 
         $orders = Order::select(
+                            DB::raw('orders.id'),
                             DB::raw('orders.product_name'),
                             DB::raw('orders.contract_enddate as expiry_date'),
                             DB::raw('orders.amount'),
                             DB::raw('(orders.amount * 0.2) as vat_amount'),
                             DB::raw('orders.total_amount as total'),
                             DB::raw('companies.name as company_name'),
-                            'total_discount_amount'
+                            'total_discount_amount',
+                            DB::raw('CONCAT("https://app.capital-office.co.uk/api/order/", orders.id, "/invoice") as pdf')
                         )
                     ->join('companies', 'companies.id', '=', 'orders.company_id')
                     ->where(DB::raw('orders.client_id'), '=', $client_id)
@@ -3424,6 +3430,110 @@ class ClientController extends Controller
 
         return response()->json(['success' => 1]);
 
+    }
+    
+    public function updatePassword(Request $request) {
+
+        $user = Auth::user();
+
+        $validate = Validator::make($request->all(), [
+                'current_password' => ['required', new MatchOldPassword],
+                'new_password' => ['required'],
+                'new_confirm_password' => ['same:new_password'],
+            ]);
+            
+        if ($validate->fails()) {
+
+            return response()->json(['error' => 1]);
+
+        }
+   
+        $user->update(['password'=> Hash::make($request->new_password)]);
+   
+        return response()->json(['success' => 1]);
+
+    }
+    
+    public function orderInvoice($id) {
+
+        $order = Order::find( $id );
+
+        $company = $order->company;
+        
+
+        $order->product;
+        $order->client;
+
+        $data['order'] = $order;        
+
+        //return view('orders.invoice', $data);
+
+        //view()->share('order', $order);
+        
+        $pdf = DOMPDF::loadView('orders.invoice', $data);
+
+        //$pdf->setPaper('A4', 'portrait');
+        
+        return $pdf->download('order_invoice-'.$order->id.'.pdf'); 
+    }
+
+    public function forgotPassword(Request $request) {
+
+        $email = $request->get('email');
+
+        $client = Client::where('email', '=', $email)
+                            ->where('deleted', '=', 0)
+                            ->where('active', '=', 1)
+                            ->first();
+
+        if ($client) {
+
+            $password = $this->generate_password();
+
+            $client->remember_password = str_replace('/', '', Hash::make($password));
+            
+            $client->save();           
+
+            $template = EmailTemplate::where('static_email_heading', '=', 'FORGOT_PASSWORD')->first();
+
+            $src = ['[user_name]', '[site_name]', '[link]','[site_address]'];
+
+            $link = sprintf("https://admin.capital-office.co.uk/reset-password/%s", $client->remember_password);
+
+            $replace = [sprintf("%s %s", $client->first_name, $client->last_name), 'CAPITAL OFFICE LTD', $link, 'https://admin.capital-office.co.uk/'];
+
+            $content = str_replace($src, $replace, $template->template);
+
+            $mail = new SendMailable($content);
+
+            $email = 'celsomalacasjr@gmail.com';
+
+            $mail->to_email = $email;
+            $mail->to_name = sprintf("%s %s", $client->first_name, $client->last_name);
+            $mail->subject = $template->subject;
+            $mail->mail = $email;
+
+            $mail->process_name = 'FORGOT PASSWORD';
+
+            Mail::to($mail->mail)->send($mail);
+
+            //dispatch(new sendMailJob($mail))->delay(Carbon::now()->addSeconds(5));    
+
+        }
+
+        return response()->json(['success' => 1], 200, [], JSON_NUMERIC_CHECK);
+        
+    }
+
+    private function generate_password(){
+    	// password Generate
+    	$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    	$length = 10;
+    	$randomString = '';
+    	for($i = 0; $i < $length; $i ++) {
+    		$randomString .= $characters [rand ( 0, strlen ( $characters ) - 1 )];
+    	}
+    	return $randomString;
     }
     
 }
