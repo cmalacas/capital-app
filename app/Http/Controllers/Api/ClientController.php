@@ -3431,6 +3431,51 @@ class ClientController extends Controller
         return response()->json(['success' => 1]);
 
     }
+
+    public function updatePassword(Request $request) {
+
+        $user = Auth::user();
+
+        $validate = $request->validate([
+                'current_password' => ['required', new MatchOldPassword],
+                'new_password' => ['required'],
+                'new_confirm_password' => ['same:new_password'],
+            ]);
+
+        if ($validate->fails) {
+
+            return response()->json(['error' => 1]);
+
+        }
+   
+        $user->update(['password'=> Hash::make($request->new_password)]);
+   
+        return response()->json(['success' => 1]);
+
+    }
+
+    public function orderInvoice($id) {
+
+        $order = Order::find( $id );
+
+        $company = $order->company;
+        
+
+        $order->product;
+        $order->client;
+
+        $data['order'] = $order;        
+
+        //return view('order_invoice_pdf', $data);
+
+        //view()->share('order', $order);
+        
+        $pdf = DOMPDF::loadView('orders.invoice', $data);
+
+        //$pdf->setPaper('A4', 'portrait');
+        
+        return $pdf->download('order_invoice-'.$order->id.'.pdf'); 
+    }
     
     public function updatePassword(Request $request) {
 
