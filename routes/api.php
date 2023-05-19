@@ -8,6 +8,9 @@ Route::post('/login', 'Api\ClientController@login');
 Route::post('/reset-password', 'Api\ClientController@resetPassword');
 
 Route::get('/order/{id}/invoice', 'Api\ClientController@orderInvoice');
+Route::get('/fund/{id}/invoice', 'Api\ClientController@virtualInvoice');
+Route::get('/scan/{id}/invoice', 'Api\ClientController@scanInvoice');
+Route::get('/invoice/{id}/invoice', 'Api\ClientController@invoiceInvoice');
 
 Route::get('/forgot-password', 'Api\ClientController@forgotPassword');
 

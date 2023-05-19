@@ -13,7 +13,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-
 use App\Client;
 use App\Company;
 use App\Order;
@@ -694,6 +693,8 @@ class ClientController extends Controller
 
             $i->payNow = sprintf("%s/app/invoice/%s/pay-now", env('APP_URL'), $i->invoice_id);
 
+            $i->pdf = sprintf("%s/api/invoice/%s/invoice", env('APP_URL'), $i->invoice_id);
+
         }
 
         $data['client'] = $client;
@@ -853,7 +854,8 @@ class ClientController extends Controller
                             'virtual_accounts.*',
                             DB::raw('"Payment Top Up" as `order`'),
                             DB::raw('IF(type = 0, "Debit", "Credit") as `type`'),
-                            DB::raw('(SELECT transaction_id FROM sagetransactions WHERE virtual_account_id = virtual_accounts.id AND payment_status = 2 LIMIT 1) as transaction_id')
+                            DB::raw('(SELECT transaction_id FROM sagetransactions WHERE virtual_account_id = virtual_accounts.id AND payment_status = 2 LIMIT 1) as transaction_id'),
+                            DB::raw('CONCAT("https://app.capital-office.co.uk/api/fund/", virtual_accounts.id, "/invoice") as pdf')
                         )
                     ->where('client_id', '=', $client_id)
                     ->where('payment_status', '=', 2)
@@ -866,7 +868,8 @@ class ClientController extends Controller
                                 DB::raw('credit_quantity'),
                                 DB::raw('NULL as transaction_id'),
                                 'payment_status',
-                                'created'
+                                'created',
+                                DB::raw('CONCAT("https://app.capital-office.co.uk/api/scan/", scan_accounts.id, "/invoice") as pdf')
                             )
                         ->where('client_id', '=', $client_id)                      
                         ->where('payment_status', '=', 2)
@@ -3466,61 +3469,18 @@ class ClientController extends Controller
 
         $data['order'] = $order;        
 
-        //return view('order_invoice_pdf', $data);
-
-        //view()->share('order', $order);
-        
-        $pdf = DOMPDF::loadView('orders.invoice', $data);
-
-        //$pdf->setPaper('A4', 'portrait');
-        
-        return $pdf->download('order_invoice-'.$order->id.'.pdf'); 
-    }
-    
-    public function updatePassword(Request $request) {
-
-        $user = Auth::user();
-
-        $validate = Validator::make($request->all(), [
-                'current_password' => ['required', new MatchOldPassword],
-                'new_password' => ['required'],
-                'new_confirm_password' => ['same:new_password'],
-            ]);
-            
-        if ($validate->fails()) {
-
-            return response()->json(['error' => 1]);
-
-        }
-   
-        $user->update(['password'=> Hash::make($request->new_password)]);
-   
-        return response()->json(['success' => 1]);
-
-    }
-    
-    public function orderInvoice($id) {
-
-        $order = Order::find( $id );
-
-        $company = $order->company;
-        
-
-        $order->product;
-        $order->client;
-
-        $data['order'] = $order;        
-
         //return view('orders.invoice', $data);
 
         //view()->share('order', $order);
         
         $pdf = DOMPDF::loadView('orders.invoice', $data);
 
-        //$pdf->setPaper('A4', 'portrait');
-        
         return $pdf->download('order_invoice-'.$order->id.'.pdf'); 
     }
+    
+    
+    
+    
 
     public function forgotPassword(Request $request) {
 
@@ -3579,6 +3539,77 @@ class ClientController extends Controller
     		$randomString .= $characters [rand ( 0, strlen ( $characters ) - 1 )];
     	}
     	return $randomString;
+    }
+
+    public function virtualInvoice($id) {
+        
+        $virtual = VirtualAccount::find($id);
+        
+        if ($virtual->type == 0) {
+
+            $order = Order::find($virtual->order_id);
+
+            $company = $order->company;
+
+            $order->product;
+            $order->client;
+
+            $data['order'] = $order;        
+
+            $pdf = DOMPDF::loadView('orders.invoice', $data);
+
+            return $pdf->download('order_invoice-'.$order->id.'.pdf'); 
+
+        } else {
+
+            $data['virtual'] = $virtual;
+
+            $pdf = DOMPDF::loadView('orders.virtual_invoice', $data);
+
+            return $pdf->download('order_invoice-'.$virtual->id.'.pdf'); 
+
+        }
+
+    }
+
+    public function scanInvoice($id) {
+        
+        $scan = ScanAccount::where('id', '=', $id)->first();
+
+        $data['scan'] = $scan;
+
+        $data['vat'] = 20;        
+        
+        $pdf = DOMPDF::loadView('orders.scan_invoice', $data);
+
+        return $pdf->download('scan_invoice-'.$id.'.pdf');         
+
+    }
+
+    public function invoiceInvoice($id) {
+
+        $i = InvoiceMaster::find($id);
+        
+        $company = Company::find($i->company_id);
+
+        $inv['company_name'] = $company->name;
+        $inv['address'] = $company->address_1;
+        $inv['city'] = $company->city;
+        $inv['phone_number'] = $company->phone_number;
+        $inv['email'] = $company->email;
+        $inv['post_code'] = $company->post_code;
+        $inv['invoice_id'] = $i->invoice_id;
+        $inv['created_date'] = $i->created_at;
+        $inv['paid_date'] = $i->paid_at;
+
+        $inv['orders'] = $i->orders;
+
+        $inv['gross_amount'] = number_format($i->gross_amount, 2);      
+
+        $pdf = DOMPDF::loadView('orders.view_invoice', $inv);
+
+        return $pdf->download('invoice-'.$id.'.pdf'); 
+
     }
     
 }
