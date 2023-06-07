@@ -14,6 +14,12 @@ Route::get('/invoice/{id}/invoice', 'Api\ClientController@invoiceInvoice');
 
 Route::get('/forgot-password', 'Api\ClientController@forgotPassword');
 
+Route::get('/invoice/{id}/failed', 'Api\ClientController@failed');
+Route::get('/topup/{id}/failed', 'Api\ClientController@failed');
+Route::get('/{id}/new-service-failed', 'Api\ClientController@failed');
+Route::get('/scan-topup/{id}/failed', 'Api\ClientController@failed');
+Route::get('/{id}/renew-failed', 'Api\ClientController@failed');
+
 Route::group(['middleware' => 'auth:sanctum'], function() {
 
     Route::get('/accounts', 'Api\ClientController@accounts');
@@ -40,7 +46,7 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
 
     Route::get('/invoice/{id}/success', 'Api\ClientController@invoiceSuccess');
 
-    Route::get('/invoice/{id}/failed', 'Api\ClientController@invoiceFailed');
+    
 
     Route::get('/update-password', 'Api\ClientController@updatePassword');
 
@@ -56,11 +62,11 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
 
     Route::get('/topup/{id}/success', 'Api\ClientController@topUpSuccess');
 
-    Route::get('/topup/{id}/failed', 'Api\ClientController@topUpFailed');
+    
 
     Route::get('/scan-topup/{id}/success', 'Api\ClientController@scanTopUpSuccess');
 
-    Route::get('/scan-topup/{id}/failed', 'Api\ClientController@scanTopUpFailed');
+    
 
     Route::get('/{id}/renew', 'Api\ClientController@renew');
 
@@ -68,7 +74,7 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
 
     Route::get('/{id}/renew-success', 'Api\ClientController@renewSuccess');
 
-    Route::get('/{id}/renew-failed', 'Api\ClientController@renewFailed');
+    
 
     Route::get('/coupon', 'Api\ClientController@getCoupon');
 
@@ -77,6 +83,8 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
     Route::get('/pay-new-service', 'Api\ClientController@payNewService');
 
     Route::get('/{id}/new-service-success', 'Api\ClientController@newServiceSuccess');
+
+    
 
     Route::get('/company-information/{id}/edit', 'Api\ClientController@getCompanyInformation');
 

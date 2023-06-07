@@ -3611,5 +3611,11 @@ class ClientController extends Controller
         return $pdf->download('invoice-'.$id.'.pdf'); 
 
     }
+
+    public function failed() {
+
+        return response()->json(['failed' => 1], 200, [], JSON_NUMERIC_CHECK);
+
+    }
     
 }
